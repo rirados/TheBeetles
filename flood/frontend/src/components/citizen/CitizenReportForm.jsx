@@ -40,14 +40,14 @@ export default function CitizenReportForm({ position, onSubmit }) {
   }, []);
 
   async function startCamera() {
-    const getUserMedia =
-      navigator.mediaDevices?.getUserMedia ||
-      navigator.getUserMedia ||
-      navigator.webkitGetUserMedia ||
-      navigator.mozGetUserMedia;
-
-    if (!getUserMedia) {
+    if (!navigator.mediaDevices?.getUserMedia && !navigator.getUserMedia && !navigator.webkitGetUserMedia && !navigator.mozGetUserMedia) {
       setCameraError("Camera access is not supported in this browser.");
+      return;
+    }
+
+    const isSecureContext = window.isSecureContext || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+    if (!isSecureContext) {
+      setCameraError("Camera access requires a secure connection. Please open the app over HTTPS or localhost and allow camera permission.");
       return;
     }
 
@@ -56,14 +56,6 @@ export default function CitizenReportForm({ position, onSubmit }) {
       { video: { facingMode: { ideal: "user" } }, audio: false },
       { video: true, audio: false },
     ];
-
-    const requestStream = (constraints) =>
-      new Promise((resolve, reject) => {
-        const result = getUserMedia.call(navigator, constraints, resolve, reject);
-        if (result && typeof result.then === "function") {
-          result.then(resolve).catch(reject);
-        }
-      });
 
     setCameraError(null);
 
@@ -74,12 +66,22 @@ export default function CitizenReportForm({ position, onSubmit }) {
           streamRef.current = null;
         }
 
-        const stream = await requestStream(constraints);
+        const stream = await navigator.mediaDevices?.getUserMedia?.(constraints).catch(() => null) ??
+          await new Promise((resolve, reject) => {
+            const legacy = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            if (!legacy) {
+              reject(new Error("Camera API is unavailable in this browser."));
+              return;
+            }
+            legacy.call(navigator, constraints, resolve, reject);
+          });
+
         streamRef.current = stream;
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           videoRef.current.muted = true;
           videoRef.current.playsInline = true;
+          videoRef.current.autoplay = true;
           await videoRef.current.play().catch(() => undefined);
         }
         setCameraActive(true);
@@ -245,7 +247,8 @@ export default function CitizenReportForm({ position, onSubmit }) {
         <div>
           <label className="label">Description (optional)</label>
           <textarea
-            className="textarea"
+            className="textarea text-black placeholder:text-gray-500"
+            style={{ color: "#000" }}
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}

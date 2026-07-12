@@ -4,6 +4,7 @@ import AdminSidebar from "../components/admin/AdminSidebar";
 import MetricsBar from "../components/admin/MetricsBar";
 import LiveFeedPanel from "../components/admin/LiveFeedPanel";
 import { useWebSocket } from "../hooks/useWebSocket";
+import { useGeolocation } from "../hooks/useGeolocation";
 import { api } from "../services/api";
 import { ICONS, vehicleIcon, makeIcon, makePulseIcon, hazardIcon } from "../utils/icons";
 import { riskColor } from "../utils/format";
@@ -101,6 +102,7 @@ function geometryIntersectsFlood(geometry, lat, lng, radiusM = 150) {
 
 export default function AdminPage() {
   const { connected, on } = useWebSocket("admin");
+  const { position: gpsPosition, error: gpsError, loading: gpsLoading, requestPosition, watch } = useGeolocation();
   const [reports, setReports] = useState([]);
   const [vehicles, setVehicles] = useState([]);
   const [incidents, setIncidents] = useState([]);
@@ -115,6 +117,7 @@ export default function AdminPage() {
   const [selectedProfile, setSelectedProfile] = useState("emergency");
   const [activeTab, setActiveTab] = useState("router");
   const pollRef = useRef(null);
+  const gpsWatchIdRef = useRef(null);
 
   // ---- Route Planner state ----
   const [rpOrigin, setRpOrigin] = useState(null);
@@ -169,6 +172,18 @@ export default function AdminPage() {
         log("error", `Init failed: ${e.message}`);
       }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Try to get location on mount for the admin map and route planner
+  useEffect(() => {
+    requestPosition();
+    gpsWatchIdRef.current = watch();
+    return () => {
+      if (gpsWatchIdRef.current != null && "geolocation" in navigator) {
+        navigator.geolocation.clearWatch(gpsWatchIdRef.current);
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -544,7 +559,7 @@ export default function AdminPage() {
     setRpOrigin(newOrigin);
 
     try {
-        const res = await api.planRoute({
+      const res = await api.planRoute({
         origin: { lat: newOrigin.lat, lng: newOrigin.lng },
         destination: { lat: simDestination.lat, lng: simDestination.lng },
         profile: "emergency",
@@ -602,6 +617,8 @@ export default function AdminPage() {
     }
   }, [handleFloodSimulation]);
 
+  const center = gpsPosition ? [gpsPosition.lat, gpsPosition.lng] : DEFAULT_CENTER;
+
   return (
     <div className="h-full grid grid-rows-[auto_1fr]">
       <MetricsBar
@@ -612,15 +629,30 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] overflow-hidden">
         {/* Map */}
         <div className="relative">
-          <MapContainer center={DEFAULT_CENTER} zoom={14} className="h-full w-full">
+          <MapContainer center={center} zoom={14} className="h-full w-full">
             <TileLayer
               attribution='&copy; OpenStreetMap contributors'
               url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             />
-
-            <MapClickHandler pickMode={pickMode} onMapClick={handleMapClick} />
-
-            {/* Flood-affected edges */}
+            {gpsPosition && (
+              <>
+                <Marker position={[gpsPosition.lat, gpsPosition.lng]} icon={ICONS.citizen}>
+                  <Popup>
+                    <div>
+                      <strong>Your location</strong>
+                      <br />
+                      <small>Accuracy: ±{Math.round(gpsPosition.accuracy)}m</small>
+                    </div>
+                  </Popup>
+                </Marker>
+                <Circle
+                  center={[gpsPosition.lat, gpsPosition.lng]}
+                  radius={gpsPosition.accuracy || 50}
+                  pathOptions={{ color: "#b88b5a", fillColor: "#b88b5a", fillOpacity: 0.1 }}
+                />
+                <Recenter position={gpsPosition} />
+              </>
+            )}
             {floodEdges.map((e, idx) => (
               <Polyline
                 key={`fe-${e.u}-${e.v}-${e.k}-${idx}`}
@@ -756,10 +788,10 @@ export default function AdminPage() {
           {/* Pick mode indicator */}
           {pickMode && (
             <div className={`absolute top-3 right-3 z-[1000] border rounded-lg px-3 py-1.5 backdrop-blur slide-in ${pickMode === "origin"
-                ? "bg-[#eef7ff] border-[#9fc8e8]"
-                : pickMode === "flood"
-                  ? "bg-[#fff1f0] border-[#f2b8b0]"
-                  : "bg-[#fff1f0] border-[#f2b8b0]"
+              ? "bg-[#eef7ff] border-[#9fc8e8]"
+              : pickMode === "flood"
+                ? "bg-[#fff1f0] border-[#f2b8b0]"
+                : "bg-[#fff1f0] border-[#f2b8b0]"
               }`}>
               <span className={`text-xs blink ${pickMode === "origin" ? "text-[#4f6d7a]" : "text-[#9a4a3c]"
                 }`}>
