@@ -20,7 +20,7 @@ export default function ReportsPanel({ reports }) {
             key={t}
             onClick={() => setFilter(t)}
             className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-wide font-medium ${
-              filter === t ? "bg-blue-600 text-white" : "bg-[#1a2541] text-gray-400 hover:text-white"
+              filter === t ? "bg-[#f3e1c8] text-[#5b422f]" : "bg-[#f7efe6] text-[#7d6f5f] hover:text-[#5b422f]"
             }`}
           >
             {t.replace("_", " ")}
@@ -46,7 +46,7 @@ export default function ReportsPanel({ reports }) {
                     {r.hazard_type.replace("_", " ")}
                   </span>
                   {r.hazard_type === "flood" && (
-                    <span className="text-[10px] text-blue-300">· {r.flood_depth}</span>
+                    <span className="text-[10px] text-[#8f6b45]">· {r.flood_depth}</span>
                   )}
                 </div>
                 <span className={`badge ${statusBadgeClass(r.status)}`}>{r.status}</span>
@@ -55,7 +55,7 @@ export default function ReportsPanel({ reports }) {
                 <div className="text-xs text-gray-400">{r.description}</div>
               )}
               {r.photo_data_url && (
-                <div className="space-y-1.5 rounded border border-[#1f2d4d] bg-[#0b1220] p-2">
+                <div className="space-y-1.5 rounded border border-[#e6dbca] bg-[#f7efe6] p-2">
                   <img src={r.photo_data_url} alt="Hazard report" className="h-32 w-full rounded object-cover" />
                   <div className="text-[10px] text-gray-400">
                     <div>📍 Capture: {r.photo_gps_lat?.toFixed(4) ?? "—"}, {r.photo_gps_lng?.toFixed(4) ?? "—"}</div>
@@ -79,7 +79,7 @@ export default function ReportsPanel({ reports }) {
                     {((r.confidence_score || 0) * 100).toFixed(0)}%
                   </span>
                 </div>
-                <div className="h-1.5 bg-[#0b1220] rounded overflow-hidden">
+                <div className="h-1.5 bg-[#efe4d4] rounded overflow-hidden">
                   <div
                     className="h-full transition-all"
                     style={{

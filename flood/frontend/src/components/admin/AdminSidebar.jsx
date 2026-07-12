@@ -4,10 +4,10 @@ import AlertsPanel from "./AlertsPanel";
 import RoutePlannerPanel from "./RoutePlannerPanel";
 
 const TABS = [
-  { id: "router", label: "Router", icon: "🧭" },
-  { id: "vehicles", label: "Vehicles", icon: "🚑" },
-  { id: "reports", label: "Reports", icon: "📋" },
-  { id: "alerts", label: "Alerts", icon: "⚠️" },
+  { id: "router", label: "Router", icon: "" },
+  { id: "vehicles", label: "Vehicles", icon: "" },
+  { id: "reports", label: "Reports", icon: "" },
+  { id: "alerts", label: "Alerts", icon: "" },
 ];
 
 export default function AdminSidebar({
@@ -44,9 +44,9 @@ export default function AdminSidebar({
   simStatus,
 }) {
   return (
-    <div className="bg-[#0b1220] border-l border-[#1f2d4d] flex flex-col overflow-hidden">
+    <div className="bg-[#fffdf9] border-l border-[#e6dbca] flex flex-col overflow-hidden">
       {/* Tab bar */}
-      <div className="flex border-b border-[#1f2d4d] flex-shrink-0 overflow-x-auto">
+      <div className="flex border-b border-[#e6dbca] flex-shrink-0 overflow-x-auto bg-[#fcfbf7]">
         {TABS.map((t) => {
           const count =
             t.id === "vehicles"
@@ -62,15 +62,15 @@ export default function AdminSidebar({
               onClick={() => setActiveTab(t.id)}
               className={`flex-1 min-w-[60px] px-2 py-2.5 text-xs font-medium border-b-2 transition-colors flex flex-col items-center gap-0.5 ${
                 activeTab === t.id
-                  ? "border-blue-500 text-white bg-[#111a2e]"
-                  : "border-transparent text-gray-400 hover:text-white hover:bg-[#111a2e]/50"
+                  ? "border-[#7fb8e6] text-[#274b63] bg-[#eef7ff]"
+                  : "border-transparent text-[#7d6f5f] hover:text-[#274b63] hover:bg-[#f7efe6]"
               }`}
             >
               <span className="text-base">{t.icon}</span>
               <span className="flex items-center gap-1">
                 {t.label}
                 {count != null && count > 0 && (
-                  <span className="bg-[#1a2541] text-[9px] px-1 rounded">
+                  <span className="bg-[#f3eadf] text-[9px] px-1 rounded text-[#6b4f2f]">
                     {count}
                   </span>
                 )}

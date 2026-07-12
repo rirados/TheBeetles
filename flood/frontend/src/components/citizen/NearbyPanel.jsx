@@ -32,8 +32,8 @@ export default function NearbyPanel({ facilities, position }) {
               onClick={() => setFilter(t)}
               className={`px-2 py-0.5 rounded text-[11px] uppercase tracking-wide font-medium ${
                 filter === t
-                  ? "bg-blue-600 text-white"
-                  : "bg-[#1a2541] text-gray-400 hover:text-white"
+                  ? "bg-[#f3e1c8] text-[#5b422f] border border-[#d9ba8f]"
+                  : "bg-[#f7efe6] text-[#7d6f5f] hover:text-[#5b422f]"
               }`}
             >
               {t}
@@ -44,7 +44,7 @@ export default function NearbyPanel({ facilities, position }) {
           {withDistance.map((f) => (
             <div
               key={f.id}
-              className="flex items-center justify-between text-xs p-2 bg-[#0b1220] rounded border border-[#1f2d4d]"
+              className="flex items-center justify-between text-xs p-2 bg-[#f7efe6] rounded border border-[#e6dbca]"
             >
               <div>
                 <div className="font-medium">{f.name}</div>
@@ -55,7 +55,7 @@ export default function NearbyPanel({ facilities, position }) {
               </div>
               <div className="text-right">
                 {f.distance != null && (
-                  <div className="text-blue-400 font-mono text-[11px]">
+                  <div className="text-[#8f6b45] font-mono text-[11px]">
                     {fmtDistance(f.distance)}
                   </div>
                 )}

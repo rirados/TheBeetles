@@ -104,6 +104,48 @@ def decay_risk(hours: float = 1.0):
     }
 
 
+def clear_dashboard_data(db: Session) -> Dict[str, Any]:
+    """Clear stored citizen reports and reset active route state on vehicles."""
+    reports_deleted = db.query(db_models.Report).delete(synchronize_session=False)
+    vehicles_updated = (
+        db.query(db_models.Vehicle)
+        .update(
+            {
+                db_models.Vehicle.route_geometry: None,
+                db_models.Vehicle.route_eta_seconds: None,
+                db_models.Vehicle.route_distance_m: None,
+                db_models.Vehicle.route_profile: "fastest",
+                db_models.Vehicle.status: "idle",
+                db_models.Vehicle.assigned_incident_id: None,
+            },
+            synchronize_session=False,
+        )
+    )
+    incidents_reset = (
+        db.query(db_models.Incident)
+        .update(
+            {
+                db_models.Incident.vehicle_id: None,
+                db_models.Incident.status: "resolved",
+            },
+            synchronize_session=False,
+        )
+    )
+    db.commit()
+    return {
+        "ok": True,
+        "reports_deleted": reports_deleted,
+        "vehicles_updated": vehicles_updated,
+        "incidents_reset": incidents_reset,
+    }
+
+
+@router.post("/clear-all")
+def clear_all_dashboard_data(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """Clear all stored reports and route state from the dashboard."""
+    return clear_dashboard_data(db)
+
+
 @router.post("/simulate/flood")
 def simulate_flood(lat: float, lng: float, depth: str = "waist"):
     """Simulate a flood at a point — blocks nearby road edges.

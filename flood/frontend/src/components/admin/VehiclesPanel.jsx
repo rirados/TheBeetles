@@ -39,30 +39,30 @@ function Section({ title, vehicles }) {
               <span className={`badge ${statusBadgeClass(v.status)}`}>{v.status}</span>
             </div>
             <div className="grid grid-cols-2 gap-2 text-[10px]">
-              <div className="bg-[#0b1220] rounded p-1.5 border border-[#1f2d4d]">
+              <div className="bg-[#f7efe6] rounded p-1.5 border border-[#e6dbca]">
                 <div className="text-gray-500 uppercase">Position</div>
-                <div className="font-mono text-gray-300">
+                <div className="font-mono text-[#4f463b]">
                   {v.lat?.toFixed(4)}, {v.lng?.toFixed(4)}
                 </div>
               </div>
-              <div className="bg-[#0b1220] rounded p-1.5 border border-[#1f2d4d]">
+              <div className="bg-[#f7efe6] rounded p-1.5 border border-[#e6dbca]">
                 <div className="text-gray-500 uppercase">Speed</div>
-                <div className="font-mono text-gray-300">
+                <div className="font-mono text-[#4f463b]">
                   {(v.speed_kmh || 0).toFixed(1)} km/h
                 </div>
               </div>
             </div>
             {v.route_eta_seconds != null && (
               <div className="grid grid-cols-2 gap-2 text-[10px]">
-                <div className="bg-[#0b1220] rounded p-1.5 border border-[#1f2d4d]">
+                <div className="bg-[#f7efe6] rounded p-1.5 border border-[#e6dbca]">
                   <div className="text-gray-500 uppercase">ETA</div>
-                  <div className="font-mono text-blue-300">
+                  <div className="font-mono text-[#8f6b45]">
                     {fmtDuration(v.route_eta_seconds)}
                   </div>
                 </div>
-                <div className="bg-[#0b1220] rounded p-1.5 border border-[#1f2d4d]">
+                <div className="bg-[#f7efe6] rounded p-1.5 border border-[#e6dbca]">
                   <div className="text-gray-500 uppercase">Distance</div>
-                  <div className="font-mono text-gray-300">
+                  <div className="font-mono text-[#4f463b]">
                     {fmtDistance(v.route_distance_m)}
                   </div>
                 </div>
@@ -74,7 +74,7 @@ function Section({ title, vehicles }) {
               </div>
             )}
             {v.depot_name && (
-              <div className="text-[10px] text-gray-500">🏠 {v.depot_name}</div>
+              <div className="text-[10px] text-gray-500"> {v.depot_name}</div>
             )}
           </div>
         </div>
@@ -85,10 +85,10 @@ function Section({ title, vehicles }) {
 
 function vehicleEmoji(t) {
   return {
-    ambulance: "🚑",
-    fire_truck: "🚒",
-    police: "🚓",
-    rescue_boat: "🚤",
-    ndrf: "🎖️",
-  }[t] || "🚗";
+    ambulance: "",
+    fire_truck: "",
+    police: "",
+    rescue_boat: "",
+    ndrf: "",
+  }[t] || "";
 }

@@ -72,9 +72,9 @@ export default function RoutePlannerPanel({
 
   return (
     <div className="p-3 space-y-3">
-      <div className="rounded border border-blue-500/30 bg-blue-500/10 px-2.5 py-2 text-[10px] text-blue-200">
+      <div className="rounded border border-[#9fc8e8] bg-[#eef7ff] px-2.5 py-2 text-[10px] text-[#4f6d7a]">
         <div className="font-semibold uppercase tracking-wide">Emergency routing</div>
-        <div className="mt-1 text-gray-300">All route planning and rerouting now operate in emergency mode and will step to the next available alternative if a flood blocks the current path.</div>
+        <div className="mt-1 text-[#5f6f79]">All route planning and rerouting now operate in emergency mode and will step to the next available alternative if a flood blocks the current path.</div>
       </div>
 
       {/* Origin */}
@@ -84,15 +84,15 @@ export default function RoutePlannerPanel({
           <div className="flex items-center gap-2">
             <button
               onClick={useMyLocation}
-              className="text-[10px] text-blue-400 hover:text-blue-300"
+              className="text-[10px] text-[#8f6b45] hover:text-[#6f5136]"
             >
               My GPS
             </button>
             <button
               onClick={() => onPickModeChange(pickMode === "origin" ? null : "origin")}
               className={`text-[10px] ${pickMode === "origin"
-                  ? "text-blue-300 blink"
-                  : "text-blue-400 hover:text-blue-300"
+                  ? "text-[#8f6b45] blink"
+                  : "text-[#8f6b45] hover:text-[#6f5136]"
                 }`}
             >
               {pickMode === "origin" ? "Click on map..." : "Pick on map"}
@@ -135,7 +135,7 @@ export default function RoutePlannerPanel({
             onClick={() => onPickModeChange(pickMode === "destination" ? null : "destination")}
             className={`text-[10px] ${pickMode === "destination"
                 ? "text-red-400 blink"
-                : "text-blue-400 hover:text-blue-300"
+                : "text-[#8f6b45] hover:text-[#6f5136]"
               }`}
           >
             {pickMode === "destination" ? "Click on map..." : "Pick on map"}
@@ -175,7 +175,7 @@ export default function RoutePlannerPanel({
         disabled={planning || !originLat || !destLat || simulating}
         className="btn btn-primary w-full text-sm"
       >
-        {planning ? "Computing 3 emergency routes..." : "Compute 3 Emergency Routes"}
+        {planning ? "Computing emergency routes..." : "Compute Emergency Routes"}
       </button>
 
       {planError && (
@@ -193,7 +193,7 @@ export default function RoutePlannerPanel({
           <p className="text-[10px] text-gray-500 leading-relaxed">
             The best route is highlighted automatically. When a flood is plotted on the active path, the vehicle reroutes from its live position in real time and steps to the next available alternative if needed.
           </p>
-          <div className="rounded border border-blue-500/30 bg-blue-500/10 px-2 py-1.5 text-[10px] text-blue-200">
+          <div className="rounded border border-[#9fc8e8] bg-[#eef7ff] px-2 py-1.5 text-[10px] text-[#4f6d7a]">
             <span className="font-semibold">Live simulation:</span> {simStatus}
           </div>
           {plannedRoutes.map((route, idx) => (
@@ -230,11 +230,11 @@ export default function RoutePlannerPanel({
                 <div>
                   <div className="flex justify-between text-[10px] mb-0.5">
                     <span className="text-gray-400">Vehicle Progress</span>
-                    <span className="font-mono text-blue-300">{Math.round(simProgress)}%</span>
+                    <span className="font-mono text-[#8f6b45]">{Math.round(simProgress)}%</span>
                   </div>
-                  <div className="h-2 bg-[#0b1220] rounded overflow-hidden">
+                  <div className="h-2 bg-[#efe4d4] rounded overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-200"
+                      className="h-full bg-gradient-to-r from-[#d9ba8f] to-[#b88b5a] transition-all duration-200"
                       style={{ width: `${simProgress}%` }}
                     />
                   </div>
@@ -317,25 +317,25 @@ function RouteCard({ route, idx, selected, isBest, onSelect }) {
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-2 text-[10px]">
-          <div className="bg-[#0b1220] rounded p-1.5 border border-[#1f2d4d]">
-            <div className="text-gray-500 uppercase">Distance</div>
-            <div className="font-mono text-gray-200">{fmtDistance(route.distance_m)}</div>
+          <div className="bg-[#f7efe6] rounded p-1.5 border border-[#e6dbca]">
+            <div className="text-[#7d6f5f] uppercase">Distance</div>
+            <div className="font-mono text-[#2f2a22]">{fmtDistance(route.distance_m)}</div>
           </div>
-          <div className="bg-[#0b1220] rounded p-1.5 border border-[#1f2d4d]">
-            <div className="text-gray-500 uppercase">Travel Time</div>
-            <div className="font-mono text-gray-200">{fmtDuration(route.travel_time_s)}</div>
+          <div className="bg-[#f7efe6] rounded p-1.5 border border-[#e6dbca]">
+            <div className="text-[#7d6f5f] uppercase">Travel Time</div>
+            <div className="font-mono text-[#2f2a22]">{fmtDuration(route.travel_time_s)}</div>
           </div>
         </div>
 
         {/* Total risk bar */}
         <div>
           <div className="flex justify-between text-[10px] mb-0.5">
-            <span className="text-gray-500 uppercase">Total Risk</span>
+            <span className="text-[#7d6f5f] uppercase">Total Risk</span>
             <span className="font-mono" style={{ color: riskColor(route.total_risk) }}>
               {(route.total_risk * 100).toFixed(0)}%
             </span>
           </div>
-          <div className="h-1.5 bg-[#0b1220] rounded overflow-hidden">
+          <div className="h-1.5 bg-[#efe4d4] rounded overflow-hidden">
             <div
               className="h-full transition-all"
               style={{
@@ -351,7 +351,7 @@ function RouteCard({ route, idx, selected, isBest, onSelect }) {
           <div className="grid grid-cols-4 gap-1 text-[9px]">
             {[
               ["Traffic", eb.traffic, "#f472b6"],
-              ["Rain", eb.rainfall, "#60a5fa"],
+              ["Rain", eb.rainfall, "#b88b5a"],
               ["Hist", eb.historical, "#fbbf24"],
               ["Water", eb.water, "#22d3ee"],
             ].map(([name, val, c]) => (
@@ -360,7 +360,7 @@ function RouteCard({ route, idx, selected, isBest, onSelect }) {
                 <div className="font-mono" style={{ color: c }}>
                   {((val || 0) * 100).toFixed(0)}
                 </div>
-                <div className="h-1 bg-[#0b1220] rounded mt-0.5">
+                <div className="h-1 bg-[#efe4d4] rounded mt-0.5">
                   <div
                     className="h-full rounded"
                     style={{ width: `${(val || 0) * 100}%`, background: c }}

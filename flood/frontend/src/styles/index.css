@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --bg-primary: #0b1220;
-  --bg-secondary: #111a2e;
-  --bg-tertiary: #1a2541;
-  --border: #1f2d4d;
-  --text-primary: #e8eef9;
-  --text-muted: #8a98b8;
+  --bg-primary: #fcfbf7;
+  --bg-secondary: #fffdf9;
+  --bg-tertiary: #f5efe7;
+  --border: #e6dbca;
+  --text-primary: #2f2a22;
+  --text-muted: #7d6f5f;
 }
 
 * {
@@ -23,42 +23,42 @@ body,
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
-  background: var(--bg-primary);
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #fdfcf8 0%, #f3eadf 100%);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
 }
 
 /* Leaflet overrides */
 .leaflet-container {
-  background: #0b1220 !important;
-  font-family: "Inter", sans-serif;
+  background: #f7efe6 !important;
+  font-family: "Trebuchet MS", sans-serif;
 }
 
 .leaflet-popup-content-wrapper,
 .leaflet-popup-tip {
-  background: #111a2e;
-  color: #e8eef9;
-  border: 1px solid #1f2d4d;
+  background: #fffdf9;
+  color: #2f2a22;
+  border: 1px solid #e6dbca;
 }
 
 .leaflet-control-attribution {
-  background: rgba(17, 26, 46, 0.7) !important;
-  color: #8a98b8 !important;
+  background: rgba(255, 253, 249, 0.88) !important;
+  color: #7d6f5f !important;
 }
 
 .leaflet-control-attribution a {
-  color: #60a5fa !important;
+  color: #5b8fb8 !important;
 }
 
 .leaflet-bar a {
-  background: #111a2e !important;
-  color: #e8eef9 !important;
-  border-color: #1f2d4d !important;
+  background: #fffdf9 !important;
+  color: #2f2a22 !important;
+  border-color: #e6dbca !important;
 }
 
 .leaflet-bar a:hover {
-  background: #1a2541 !important;
+  background: #f5efe7 !important;
 }
 
 /* Scrollbars */
@@ -123,9 +123,10 @@ body {
 
 /* Card */
 .card {
-  background: var(--bg-secondary);
+  background: linear-gradient(135deg, #fffdf9 0%, #f8f2e8 100%);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(110, 95, 76, 0.08);
 }
 
 .card-header {
@@ -159,22 +160,22 @@ body {
 }
 
 .btn-primary {
-  background: #2563eb;
-  color: white;
+  background: linear-gradient(135deg, #e9d3b4 0%, #cfa97c 100%);
+  color: #4e3a26;
 }
 
 .btn-primary:hover {
-  background: #1d4ed8;
+  background: linear-gradient(135deg, #dfc39f 0%, #bb8e61 100%);
 }
 
 .btn-secondary {
-  background: #1a2541;
-  color: #e8eef9;
-  border-color: #2a3960;
+  background: #f5efe7;
+  color: #5a4937;
+  border-color: #e0d0bc;
 }
 
 .btn-secondary:hover {
-  background: #243156;
+  background: #efe2d0;
 }
 
 .btn-danger {
@@ -192,7 +193,7 @@ body {
 }
 
 .btn-ghost:hover {
-  background: #1a2541;
+  background: #f5efe7;
   color: #e8eef9;
 }
 
@@ -219,8 +220,8 @@ body {
 .select:focus,
 .textarea:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  border-color: #cfa97c;
+  box-shadow: 0 0 0 2px rgba(207, 169, 124, 0.18);
 }
 
 .label {
@@ -247,7 +248,7 @@ body {
 
 .badge-info {
   background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+  color: #8f6b45;
 }
 
 .badge-warning {

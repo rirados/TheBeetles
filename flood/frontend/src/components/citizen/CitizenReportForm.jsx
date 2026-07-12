@@ -40,27 +40,68 @@ export default function CitizenReportForm({ position, onSubmit }) {
   }, []);
 
   async function startCamera() {
-    if (!navigator.mediaDevices?.getUserMedia) {
+    const getUserMedia =
+      navigator.mediaDevices?.getUserMedia ||
+      navigator.getUserMedia ||
+      navigator.webkitGetUserMedia ||
+      navigator.mozGetUserMedia;
+
+    if (!getUserMedia) {
       setCameraError("Camera access is not supported in this browser.");
       return;
     }
-    try {
-      setCameraError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+
+    const attempts = [
+      { video: { facingMode: { ideal: "environment" } }, audio: false },
+      { video: { facingMode: { ideal: "user" } }, audio: false },
+      { video: true, audio: false },
+    ];
+
+    const requestStream = (constraints) =>
+      new Promise((resolve, reject) => {
+        const result = getUserMedia.call(navigator, constraints, resolve, reject);
+        if (result && typeof result.then === "function") {
+          result.then(resolve).catch(reject);
+        }
+      });
+
+    setCameraError(null);
+
+    for (const constraints of attempts) {
+      try {
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+
+        const stream = await requestStream(constraints);
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.muted = true;
+          videoRef.current.playsInline = true;
+          await videoRef.current.play().catch(() => undefined);
+        }
+        setCameraActive(true);
+        return;
+      } catch (err) {
+        if (constraints === attempts[attempts.length - 1]) {
+          const message = err?.message || "Unable to access the camera. Please allow camera permission and try again.";
+          setCameraError(message);
+        }
       }
-      setCameraActive(true);
-    } catch (err) {
-      setCameraError(err.message || "Unable to access the camera.");
     }
   }
 
   async function capturePhoto() {
     if (!videoRef.current) return;
+
     const video = videoRef.current;
+    if (video.videoWidth === 0 || video.videoHeight === 0) {
+      setCameraError("The camera stream is not ready yet. Please wait a moment and try again.");
+      return;
+    }
+
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth || 640;
     canvas.height = video.videoHeight || 480;
@@ -127,15 +168,16 @@ export default function CitizenReportForm({ position, onSubmit }) {
       </div>
       <div className="card-body space-y-3">
         {!position && (
-          <div className="bg-yellow-900/30 border border-yellow-700/40 rounded p-2 text-xs text-yellow-300">
-            ⚠️ Waiting for GPS location. Please allow location access.
+          <div className="bg-[#f5e7d0] border border-[#d9ba8f] rounded p-2 text-xs text-[#7d4f2b]">
+            Waiting for GPS location. Please allow location access.
           </div>
         )}
 
         <div>
-          <label className="label">Hazard Type</label>
+          <label className="label text-black">Hazard Type</label>
           <select
-            className="select"
+            className="select text-black"
+            style={{ color: "#000" }}
             value={hazardType}
             onChange={(e) => setHazardType(e.target.value)}
           >
@@ -149,9 +191,10 @@ export default function CitizenReportForm({ position, onSubmit }) {
 
         {hazardType === "flood" && (
           <div>
-            <label className="label">Estimated Water Depth</label>
+            <label className="label text-black">Estimated Water Depth</label>
             <select
-              className="select"
+              className="select text-black"
+              style={{ color: "#000" }}
               value={depth}
               onChange={(e) => setDepth(e.target.value)}
             >
@@ -180,21 +223,21 @@ export default function CitizenReportForm({ position, onSubmit }) {
               {cameraError}
             </div>
           )}
-          <div className="mt-2 overflow-hidden rounded border border-[#1f2d4d] bg-[#0b1220]">
+          <div className="mt-2 overflow-hidden rounded border border-[#e6dbca] bg-[#f7efe6]">
             <video ref={videoRef} className="h-40 w-full object-cover bg-black" muted playsInline />
           </div>
           <p className="mt-1 text-[10px] text-gray-500">
             A live camera photo is required. The time and live location are captured when the shutter is clicked.
           </p>
           {photoPreview && (
-            <div className="mt-2 overflow-hidden rounded border border-[#1f2d4d] bg-[#0b1220]">
+            <div className="mt-2 overflow-hidden rounded border border-[#e6dbca] bg-[#f7efe6]">
               <img src={photoPreview} alt="Captured hazard" className="h-40 w-full object-cover" />
             </div>
           )}
           {photoMeta && (
-            <div className="mt-2 rounded border border-[#1f2d4d] bg-[#0b1220] p-2 text-[11px] text-gray-400">
-              <div>📍 Capture location: {photoMeta.lat?.toFixed(5) ?? "—"}, {photoMeta.lng?.toFixed(5) ?? "—"}</div>
-              <div>🕒 Capture time: {new Date(photoMeta.timestamp).toLocaleString()}</div>
+            <div className="mt-2 rounded border border-[#e6dbca] bg-[#f7efe6] p-2 text-[11px] text-[#5f5244]">
+              <div>Capture location: {photoMeta.lat?.toFixed(5) ?? "—"}, {photoMeta.lng?.toFixed(5) ?? "—"}</div>
+              <div>Capture time: {new Date(photoMeta.timestamp).toLocaleString()}</div>
             </div>
           )}
         </div>
@@ -212,8 +255,8 @@ export default function CitizenReportForm({ position, onSubmit }) {
 
         {/* Location summary */}
         {position && (
-          <div className="bg-[#0b1220] rounded p-2 border border-[#1f2d4d] text-[11px] text-gray-400 font-mono">
-            📍 {position.lat.toFixed(5)}, {position.lng.toFixed(5)}
+          <div className="bg-[#f7efe6] rounded p-2 border border-[#e6dbca] text-[11px] text-[#5f5244] font-mono">
+            {position.lat.toFixed(5)}, {position.lng.toFixed(5)}
             {position.accuracy && (
               <span className="text-gray-500"> (±{Math.round(position.accuracy)}m)</span>
             )}
@@ -231,7 +274,7 @@ export default function CitizenReportForm({ position, onSubmit }) {
           disabled={submitting || !position}
           className="btn btn-primary w-full"
         >
-          {submitting ? "Submitting..." : "🚨 Submit Report"}
+          {submitting ? "Submitting..." : "Submit Report"}
         </button>
       </div>
     </form>

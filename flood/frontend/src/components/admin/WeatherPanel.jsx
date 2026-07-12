@@ -113,7 +113,7 @@ export default function WeatherPanel({ weather, onInjectTraffic }) {
 
 function WeatherStat({ icon, label, value, highlight }) {
   return (
-    <div className={`p-2 rounded ${highlight ? "bg-yellow-900/30 border border-yellow-700/40" : "bg-[#0b1220] border border-[#1f2d4d]"}`}>
+    <div className={`p-2 rounded ${highlight ? "bg-[#f5e7d0] border border-[#d9ba8f]" : "bg-[#f7efe6] border border-[#e6dbca]"}`}>
       <div className="text-[10px] text-gray-500 uppercase">{label}</div>
       <div className="text-sm font-bold flex items-center gap-1">
         <span>{icon}</span> {value}
@@ -125,7 +125,7 @@ function WeatherStat({ icon, label, value, highlight }) {
 function rainColor(intensity) {
   switch (intensity) {
     case "none": return "text-gray-400";
-    case "light": return "text-blue-400";
+    case "light": return "text-[#8f6b45]";
     case "moderate": return "text-yellow-400";
     case "heavy": return "text-orange-400";
     case "extreme": return "text-red-500 blink";

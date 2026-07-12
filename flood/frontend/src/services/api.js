@@ -67,6 +67,7 @@ export const api = {
     }),
   decayRisk: (hours = 1) =>
     request(`/admin/risk/decay?hours=${hours}`, { method: "POST" }),
+  clearAll: () => request("/admin/clear-all", { method: "POST" }),
   simulateFlood: (lat, lng, depth = "waist") =>
     request(`/admin/simulate/flood?lat=${lat}&lng=${lng}&depth=${depth}`, { method: "POST" }),
 };

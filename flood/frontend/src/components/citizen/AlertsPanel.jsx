@@ -12,7 +12,7 @@ export default function AlertsPanel({ alerts }) {
         {alerts.map((a) => (
           <div
             key={a.id}
-            className="p-2 bg-[#0b1220] rounded border border-[#1f2d4d] text-xs"
+            className="p-2 bg-[#f7efe6] rounded border border-[#e6dbca] text-xs"
           >
             <div className="flex items-center justify-between mb-1">
               <span className={`badge ${severityBadgeClass(a.severity)}`}>
@@ -25,7 +25,7 @@ export default function AlertsPanel({ alerts }) {
             <div className="font-semibold">{a.title}</div>
             {a.body && <div className="text-gray-400 mt-0.5">{a.body}</div>}
             {a.area && (
-              <div className="text-[10px] text-gray-500 mt-1">📍 {a.area}</div>
+              <div className="text-[10px] text-gray-500 mt-1">{a.area}</div>
             )}
           </div>
         ))}

@@ -98,7 +98,7 @@ export default function CitizenPage() {
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           />
           {position && (
             <>
@@ -114,7 +114,7 @@ export default function CitizenPage() {
               <Circle
                 center={[position.lat, position.lng]}
                 radius={position.accuracy || 50}
-                pathOptions={{ color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 0.1 }}
+                pathOptions={{ color: "#b88b5a", fillColor: "#b88b5a", fillOpacity: 0.1 }}
               />
               <Recenter position={position} />
             </>
@@ -165,28 +165,28 @@ export default function CitizenPage() {
         </MapContainer>
 
         {/* Top overlay: location status */}
-        <div className="absolute top-3 left-3 z-[1000] flex items-center gap-2 bg-[#111a2e]/90 border border-[#1f2d4d] rounded-lg px-3 py-1.5 backdrop-blur">
+        <div className="absolute top-3 left-3 z-[1000] flex items-center gap-2 bg-[#fffdf9]/95 border border-[#e6dbca] rounded-lg px-3 py-1.5 backdrop-blur">
           <span
             className={`w-2 h-2 rounded-full ${
               connected ? "bg-green-500" : "bg-red-500 blink"
             }`}
           ></span>
-          <span className="text-xs text-gray-300">
+          <span className="text-xs text-[#4f463b]">
             {connected ? "Live" : "Reconnecting..."}
           </span>
-          <span className="text-xs text-gray-500">|</span>
+          <span className="text-xs text-[#a8937a]">|</span>
           {position ? (
-            <span className="text-xs text-gray-400 font-mono">
+            <span className="text-xs text-[#6f655b] font-mono">
               {position.lat.toFixed(4)}, {position.lng.toFixed(4)}
             </span>
           ) : (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-[#a8937a]">
               {loading ? "Locating..." : error ? "No GPS" : "No GPS"}
             </span>
           )}
           <button
             onClick={requestPosition}
-            className="text-xs text-blue-400 hover:text-blue-300 ml-1"
+            className="text-xs text-[#8f6b45] hover:text-[#6f5136] ml-1"
           >
             ↻
           </button>
@@ -223,11 +223,11 @@ export default function CitizenPage() {
       </div>
 
       {/* Side panel */}
-      <div className="bg-[#0b1220] border-l border-[#1f2d4d] overflow-y-auto">
+      <div className="bg-[#fffdf9] border-l border-[#e6dbca] overflow-y-auto">
         <div className="p-4 space-y-4">
           <div>
             <h1 className="text-lg font-bold mb-1">Report a Hazard</h1>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[#7d6f5f]">
               Help responders by reporting floods, blocked roads, or other hazards in your area.
               Your location and a geotagged photo are required.
             </p>

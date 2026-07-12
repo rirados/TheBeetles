@@ -62,7 +62,7 @@ export default function IncidentsPanel({
                 </div>
 
                 {assignedVehicle && (
-                  <div className="bg-[#0b1220] rounded p-1.5 text-[10px] border border-[#1f2d4d]">
+                  <div className="bg-[#f7efe6] rounded p-1.5 text-[10px] border border-[#e6dbca]">
                     <div className="flex justify-between">
                       <span className="text-gray-400">Assigned:</span>
                       <span className="font-medium">{assignedVehicle.call_sign}</span>
@@ -70,7 +70,7 @@ export default function IncidentsPanel({
                     {assignedVehicle.route_eta_seconds != null && (
                       <div className="flex justify-between">
                         <span className="text-gray-400">ETA:</span>
-                        <span className="font-mono text-blue-300">
+                        <span className="font-mono text-[#8f6b45]">
                           {fmtDuration(assignedVehicle.route_eta_seconds)}
                         </span>
                       </div>

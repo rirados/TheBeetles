@@ -13,10 +13,10 @@ const DEFAULT_CENTER = [12.9100, 74.8500];
 const ROUTE_COLORS = ["#22c55e", "#eab308", "#a16207"];
 
 // Origin / Destination icons for the route planner
-const ORIGIN_ICON = makeIcon("📍", "#3b82f6", 32);
-const DEST_ICON = makeIcon("🎯", "#dc2626", 32);
-const SIM_VEHICLE_ICON = makePulseIcon("🚑", "#16a34a", 36);
-const FLOOD_SIM_ICON = makePulseIcon("🌊", "#dc2626", 34);
+const ORIGIN_ICON = makeIcon("📍", "#b88b5a", 32);
+const DEST_ICON = makeIcon("🎯", "#c96b4c", 32);
+const SIM_VEHICLE_ICON = makePulseIcon("🚑", "#6d8b5e", 36);
+const FLOOD_SIM_ICON = makePulseIcon("🌊", "#c96b4c", 34);
 
 function FitBounds({ bbox }) {
   const map = useMap();
@@ -303,6 +303,29 @@ export default function AdminPage() {
       setVehicles(await api.listVehicles());
       log("vehicles_seeded", `Seeded ${created.length} vehicles`);
     } catch (e) { log("error", `Seed failed: ${e.message}`); }
+  }, [log]);
+
+  const handleClearAll = useCallback(async () => {
+    try {
+      await api.clearAll();
+      setReports([]);
+      setPlannedRoutes([]);
+      setRoutes({});
+      setFloodMarkers([]);
+      setRpOrigin(null);
+      setRpDestination(null);
+      setSelectedRouteIdx(0);
+      setPickMode(null);
+      setSimulating(false);
+      setSimVehiclePos(null);
+      setSimProgress(0);
+      setSimGeomIdx(0);
+      setSimDestination(null);
+      setSimStatus("Dashboard cleared — reports and stored routes removed");
+      log("clear_all", "Cleared stored reports and route state");
+    } catch (e) {
+      log("error", `Clear all failed: ${e.message}`);
+    }
   }, [log]);
 
   // ---------- Route Planner actions ----------
@@ -592,7 +615,7 @@ export default function AdminPage() {
           <MapContainer center={DEFAULT_CENTER} zoom={14} className="h-full w-full">
             <TileLayer
               attribution='&copy; OpenStreetMap contributors'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
             />
 
             <MapClickHandler pickMode={pickMode} onMapClick={handleMapClick} />
@@ -718,19 +741,27 @@ export default function AdminPage() {
             <LiveFeedPanel feed={feed} />
           </div>
 
-          <div className="absolute top-3 left-3 z-[1000] rounded-lg border border-blue-500/30 bg-[#111a2e]/90 px-2.5 py-1.5 text-[11px] text-blue-200 backdrop-blur">
-            Emergency routing is active for all route planning and rerouting.
+          <div className="absolute top-3 left-3 z-[1000] flex flex-col gap-2">
+            <div className="rounded-lg border border-[#9fc8e8] bg-[#fffdf9]/95 px-2.5 py-1.5 text-[11px] text-[#4f6d7a] backdrop-blur">
+              Emergency routing is active for all route planning and rerouting.
+            </div>
+            <button
+              onClick={handleClearAll}
+              className="w-fit rounded-lg border border-[#d9ba8f] bg-[#f5efe7] px-3 py-1.5 text-[11px] font-semibold text-[#5b422f] shadow-sm transition hover:bg-[#efe0c9]"
+            >
+              Clear all
+            </button>
           </div>
 
           {/* Pick mode indicator */}
           {pickMode && (
             <div className={`absolute top-3 right-3 z-[1000] border rounded-lg px-3 py-1.5 backdrop-blur slide-in ${pickMode === "origin"
-                ? "bg-blue-900/90 border-blue-600"
+                ? "bg-[#eef7ff] border-[#9fc8e8]"
                 : pickMode === "flood"
-                  ? "bg-red-900/90 border-red-600"
-                  : "bg-red-900/90 border-red-600"
+                  ? "bg-[#fff1f0] border-[#f2b8b0]"
+                  : "bg-[#fff1f0] border-[#f2b8b0]"
               }`}>
-              <span className={`text-xs blink ${pickMode === "origin" ? "text-blue-300" : "text-red-300"
+              <span className={`text-xs blink ${pickMode === "origin" ? "text-[#4f6d7a]" : "text-[#9a4a3c]"
                 }`}>
                 {pickMode === "flood"
                   ? "● Click on map to simulate flood"
@@ -741,8 +772,8 @@ export default function AdminPage() {
 
           {/* Route legend overlay (visible when routes are planned) */}
           {plannedRoutes.length > 0 && !pickMode && (
-            <div className="absolute top-3 right-3 z-[1000] bg-[#111a2e]/90 border border-[#1f2d4d] rounded-lg px-3 py-2 backdrop-blur space-y-1 slide-in">
-              <div className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-1">
+            <div className="absolute top-3 right-3 z-[1000] bg-[#fffdf9]/95 border border-[#e6dbca] rounded-lg px-3 py-2 backdrop-blur space-y-1 slide-in">
+              <div className="text-[10px] uppercase tracking-wider text-[#7d6f5f] font-semibold mb-1">
                 Optimal Routes
               </div>
               {plannedRoutes.map((route, idx) => {
@@ -751,27 +782,27 @@ export default function AdminPage() {
                   <button
                     key={idx}
                     onClick={() => setSelectedRouteIdx(idx)}
-                    className={`flex items-center gap-2 text-xs w-full text-left px-1 py-0.5 rounded ${selectedRouteIdx === idx ? "bg-[#1a2541]" : "hover:bg-[#1a2541]/50"
+                    className={`flex items-center gap-2 text-xs w-full text-left px-1 py-0.5 rounded ${selectedRouteIdx === idx ? "bg-[#f5efe7]" : "hover:bg-[#f7efe6]"
                       }`}
                   >
                     <span
                       className="w-4 h-1 rounded-full flex-shrink-0"
                       style={{ background: ROUTE_COLORS[idx % ROUTE_COLORS.length] }}
                     ></span>
-                    <span className="text-gray-300">
+                    <span className="text-[#4f463b]">
                       Route {String.fromCharCode(65 + idx)}
                     </span>
                     {isBest && (
                       <span className="text-[8px] text-emerald-400 font-bold">BEST</span>
                     )}
-                    <span className="text-gray-500 ml-auto font-mono text-[10px]">
+                    <span className="text-[#7d6f5f] ml-auto font-mono text-[10px]">
                       {(route.distance_m / 1000).toFixed(1)}km
                     </span>
                   </button>
                 );
               })}
               {simulating && (
-                <div className="text-[9px] text-blue-300 mt-1 font-mono">
+                <div className="text-[9px] text-[#8f6b45] mt-1 font-mono">
                   Vehicle: {Math.round(simProgress)}% complete
                 </div>
               )}
