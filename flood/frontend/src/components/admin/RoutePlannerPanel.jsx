@@ -18,7 +18,6 @@ export default function RoutePlannerPanel({
   onSelectRoute,
   onPickModeChange,
   pickMode,
-  vehicles,
   // Simulation props
   simulating,
   simProgress,
@@ -63,16 +62,6 @@ export default function RoutePlannerPanel({
         setOriginLng(o.lng.toFixed(5));
         onOriginChange(o);
       });
-    }
-  };
-
-  const useVehicleDepot = (vehicleId) => {
-    const v = vehicles.find((v) => v.id === vehicleId);
-    if (v) {
-      const o = { lat: v.depot_lat, lng: v.depot_lng };
-      setOriginLat(o.lat.toFixed(5));
-      setOriginLng(o.lng.toFixed(5));
-      onOriginChange(o);
     }
   };
 
@@ -135,20 +124,6 @@ export default function RoutePlannerPanel({
               />
             </div>
           </div>
-          {vehicles.length > 0 && (
-            <select
-              className="select text-[11px]"
-              onChange={(e) => e.target.value && useVehicleDepot(e.target.value)}
-              value=""
-            >
-              <option value="">Use vehicle depot...</option>
-              {vehicles.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.call_sign} — {v.depot_name || "depot"}
-                </option>
-              ))}
-            </select>
-          )}
         </div>
       </div>
 
@@ -296,30 +271,6 @@ export default function RoutePlannerPanel({
         </div>
       )}
 
-      {/* Env weight legend */}
-      <div className="card">
-        <div className="card-header py-1.5">
-          <span className="text-[10px] uppercase">Smart Profile Weights</span>
-        </div>
-        <div className="p-2 space-y-1 text-[10px]">
-          {[
-            ["1. Traffic anomalies", 0.40, "#f472b6"],
-            ["2. Current rainfall", 0.30, "#60a5fa"],
-            ["3. Historical flood", 0.20, "#fbbf24"],
-            ["4. Water proximity", 0.10, "#22d3ee"],
-          ].map(([label, weight, color]) => (
-            <div key={label} className="flex items-center gap-2">
-              <span className="w-32 text-gray-400">{label}</span>
-              <div className="flex-1 h-2 bg-[#0b1220] rounded overflow-hidden">
-                <div style={{ width: `${weight * 100}%`, background: color }} className="h-full" />
-              </div>
-              <span className="font-mono text-gray-300 w-8 text-right">
-                {(weight * 100).toFixed(0)}%
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

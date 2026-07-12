@@ -62,6 +62,10 @@ export const ICONS = {
   fire: makeIcon("🚒", "#ea580c", 28),
   depot: makeIcon("🏭", "#7c3aed", 28),
   flood: makePulseIcon("🌊", "#0891b2", 32),
+  landslide: makePulseIcon("⛰️", "#92400e", 34),
+  blocked_road: makeIcon("🚧", "#f59e0b", 30),
+  fallen_tree: makeIcon("🌳", "#15803d", 30),
+  other: makeIcon("⚠️", "#7c3aed", 30),
   incident: makePulseIcon("🆘", "#dc2626", 36),
   citizen: makeIcon("📍", "#3b82f6", 26),
   vehicle_ambulance: makeIcon("🚑", "#16a34a", 30),
@@ -73,4 +77,8 @@ export const ICONS = {
 
 export function vehicleIcon(vehicleType) {
   return ICONS[`vehicle_${vehicleType}`] || ICONS.vehicle_ambulance;
+}
+
+export function hazardIcon(hazardType) {
+  return ICONS[hazardType] || ICONS.other;
 }

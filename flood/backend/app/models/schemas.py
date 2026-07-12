@@ -22,6 +22,10 @@ class ReportCreate(BaseModel):
     lat: float
     lng: float
     accuracy_m: Optional[float] = None
+    photo_data_url: Optional[str] = None
+    photo_gps_lat: Optional[float] = None
+    photo_gps_lng: Optional[float] = None
+    shutter_time: Optional[datetime] = None
 
 
 class ReportOut(BaseModel):
@@ -32,6 +36,10 @@ class ReportOut(BaseModel):
     lat: float
     lng: float
     accuracy_m: Optional[float]
+    photo_data_url: Optional[str] = None
+    photo_gps_lat: Optional[float] = None
+    photo_gps_lng: Optional[float] = None
+    shutter_time: Optional[datetime] = None
     confidence_score: float
     validation_breakdown: Dict[str, float] = Field(default_factory=dict)
     status: str
@@ -48,7 +56,7 @@ class ReportOut(BaseModel):
 class RouteRequest(BaseModel):
     origin: LatLng
     destination: LatLng
-    profile: str = Field("smart", pattern="^(fastest|safest|emergency|smart)$")
+    profile: str = Field("emergency", pattern="^(fastest|safest|emergency)$")
     alternatives: bool = True
     num_alternatives: int = Field(3, ge=1, le=5)
     vehicle_id: Optional[str] = None
@@ -181,7 +189,7 @@ class FacilityOut(BaseModel):
 class DispatchRequest(BaseModel):
     incident_id: str
     vehicle_id: Optional[str] = None  # if None, auto-select nearest
-    profile: str = Field("emergency", pattern="^(fastest|safest|emergency|smart)$")
+    profile: str = Field("emergency", pattern="^(fastest|safest|emergency)$")
 
 
 class DispatchResponse(BaseModel):

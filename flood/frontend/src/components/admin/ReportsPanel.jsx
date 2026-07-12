@@ -54,6 +54,15 @@ export default function ReportsPanel({ reports }) {
               {r.description && (
                 <div className="text-xs text-gray-400">{r.description}</div>
               )}
+              {r.photo_data_url && (
+                <div className="space-y-1.5 rounded border border-[#1f2d4d] bg-[#0b1220] p-2">
+                  <img src={r.photo_data_url} alt="Hazard report" className="h-32 w-full rounded object-cover" />
+                  <div className="text-[10px] text-gray-400">
+                    <div>📍 Capture: {r.photo_gps_lat?.toFixed(4) ?? "—"}, {r.photo_gps_lng?.toFixed(4) ?? "—"}</div>
+                    <div>🕒 {r.shutter_time ? new Date(r.shutter_time).toLocaleString() : "—"}</div>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center justify-between text-[10px] text-gray-500">
                 <span>📍 {r.lat?.toFixed(4)}, {r.lng?.toFixed(4)}</span>
                 <span>{fmtDateTime(r.created_at)}</span>

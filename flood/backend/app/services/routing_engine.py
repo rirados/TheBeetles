@@ -1,14 +1,9 @@
 """Incremental A* routing engine.
 
-Supports four routing profiles:
+Supports three routing profiles:
   * fastest   - minimises travel time using OSM travel_time
   * safest    - penalises edges with flood risk
   * emergency - blocks high-risk edges outright, minimises risk+time
-  * smart     - 4-factor weighted environmental risk (default for Route Planner):
-                  1. traffic anomalies    (0.40)  ← highest priority
-                  2. current rainfall     (0.30)
-                  3. historical flood     (0.20)
-                  4. water-body proximity (0.10)
 
 The engine keeps all state in memory and reuses the cached graph for sub-second
 queries. When a vehicle's current route becomes invalidated by new risk data,
@@ -196,16 +191,6 @@ class RoutingEngine:
                 cost = float("inf")
             else:
                 cost = travel_time * (1.0 + 2.0 * risk)
-        elif profile == "smart":
-            # 4-factor environmental risk + flood report risk
-            env = self._compute_edge_env_risk(u, v, k)
-            total_risk = max(env["combined"], risk)
-            # Hard-block extremely risky or explicitly blocked edges
-            if blocked or total_risk >= 0.85:
-                cost = float("inf")
-            else:
-                # Weighted penalty: environmental risk + flood reports
-                cost = travel_time * (1.0 + 4.0 * total_risk)
         else:
             cost = travel_time
 
@@ -293,8 +278,6 @@ class RoutingEngine:
         edge_keys.reverse()
         result.path = node_path
 
-        # Accumulators for env risk averaging
-        env_sums = {"traffic": 0.0, "rainfall": 0.0, "historical": 0.0, "water": 0.0, "combined": 0.0}
         max_total_risk = 0.0
 
         # Build geometry
@@ -312,22 +295,10 @@ class RoutingEngine:
                 result.blocked_edges += 1
             result.edges.append(u)
 
-            # Accumulate environmental risk
-            if profile == "smart":
-                env = self._compute_edge_env_risk(u, v, k)
-                for key in env_sums:
-                    env_sums[key] += env.get(key, 0.0)
-                max_total_risk = max(max_total_risk, max(env["combined"], flood_risk))
-
         # Normalise risk scores
         if edge_keys:
             result.risk_score = result.risk_score / len(edge_keys)
-            if profile == "smart":
-                for key in env_sums:
-                    result.env_risk_breakdown[key] = env_sums[key] / len(edge_keys)
-                result.total_risk = max_total_risk
-            else:
-                result.total_risk = result.risk_score
+            result.total_risk = result.risk_score
         return result
 
     # ---------- Public API ----------

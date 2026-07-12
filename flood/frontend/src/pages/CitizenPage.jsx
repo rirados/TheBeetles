@@ -133,6 +133,13 @@ export default function CitizenPage() {
                   <div>Depth: {r.flood_depth}</div>
                   <div>Confidence: {(r.confidence_score * 100).toFixed(0)}%</div>
                   <div>Status: {r.status}</div>
+                  {r.photo_data_url && (
+                    <div className="space-y-1 pt-1">
+                      <img src={r.photo_data_url} alt="Hazard report" className="h-24 w-full rounded object-cover" />
+                      <div>Captured: {r.photo_gps_lat?.toFixed(4) ?? "—"}, {r.photo_gps_lng?.toFixed(4) ?? "—"}</div>
+                      <div>{r.shutter_time ? new Date(r.shutter_time).toLocaleString() : ""}</div>
+                    </div>
+                  )}
                 </div>
               </Popup>
             </Marker>

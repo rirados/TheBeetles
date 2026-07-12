@@ -1,17 +1,13 @@
 import ReportsPanel from "./ReportsPanel";
-import IncidentsPanel from "./IncidentsPanel";
 import VehiclesPanel from "./VehiclesPanel";
 import AlertsPanel from "./AlertsPanel";
-import WeatherPanel from "./WeatherPanel";
 import RoutePlannerPanel from "./RoutePlannerPanel";
 
 const TABS = [
   { id: "router", label: "Router", icon: "🧭" },
-  { id: "incidents", label: "Incidents", icon: "🆘" },
   { id: "vehicles", label: "Vehicles", icon: "🚑" },
   { id: "reports", label: "Reports", icon: "📋" },
   { id: "alerts", label: "Alerts", icon: "⚠️" },
-  { id: "weather", label: "Weather", icon: "🌤️" },
 ];
 
 export default function AdminSidebar({
@@ -21,13 +17,11 @@ export default function AdminSidebar({
   incidents,
   vehicles,
   alerts,
-  weather,
   onDispatch,
   onResolve,
   onCreateIncident,
   onCreateAlert,
   onClearAlert,
-  onInjectTraffic,
   // Route Planner props
   routePlannerOrigin,
   routePlannerDestination,
@@ -55,9 +49,7 @@ export default function AdminSidebar({
       <div className="flex border-b border-[#1f2d4d] flex-shrink-0 overflow-x-auto">
         {TABS.map((t) => {
           const count =
-            t.id === "incidents"
-              ? incidents.filter((i) => i.status !== "resolved").length
-              : t.id === "vehicles"
+            t.id === "vehicles"
               ? vehicles.length
               : t.id === "reports"
               ? reports.length
@@ -113,15 +105,6 @@ export default function AdminSidebar({
             simStatus={simStatus}
           />
         )}
-        {activeTab === "incidents" && (
-          <IncidentsPanel
-            incidents={incidents}
-            vehicles={vehicles}
-            onDispatch={onDispatch}
-            onResolve={onResolve}
-            onCreateIncident={onCreateIncident}
-          />
-        )}
         {activeTab === "vehicles" && <VehiclesPanel vehicles={vehicles} />}
         {activeTab === "reports" && <ReportsPanel reports={reports} />}
         {activeTab === "alerts" && (
@@ -130,9 +113,6 @@ export default function AdminSidebar({
             onCreateAlert={onCreateAlert}
             onClearAlert={onClearAlert}
           />
-        )}
-        {activeTab === "weather" && (
-          <WeatherPanel weather={weather} onInjectTraffic={onInjectTraffic} />
         )}
       </div>
     </div>

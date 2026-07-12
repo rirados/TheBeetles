@@ -37,6 +37,10 @@ async def create_report(
         lat=payload.lat,
         lng=payload.lng,
         accuracy_m=payload.accuracy_m,
+        shutter_time=payload.shutter_time,
+        photo_data_url=payload.photo_data_url,
+        photo_gps_lat=payload.photo_gps_lat,
+        photo_gps_lng=payload.photo_gps_lng,
         status="pending",
     )
 

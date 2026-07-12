@@ -1,6 +1,6 @@
 import { fmtDistance, fmtDuration, fmtTime } from "../../utils/format";
 
-export default function MetricsBar({ metrics, connected, weather, onDecayRisk, onSeedVehicles }) {
+export default function MetricsBar({ metrics, connected, weather }) {
   if (!metrics) {
     return (
       <div className="bg-[#0b1220] border-b border-[#1f2d4d] px-4 py-2 text-xs text-gray-500">
@@ -19,7 +19,6 @@ export default function MetricsBar({ metrics, connected, weather, onDecayRisk, o
       </div>
 
       {/* Metric chips */}
-      <Metric label="Active Incidents" value={metrics.active_incidents} color="text-red-400" />
       <Metric label="Active Vehicles" value={metrics.active_vehicles} color="text-blue-400" />
       <Metric label="Total Reports" value={metrics.total_reports} color="text-gray-300" />
       <Metric label="Validated" value={metrics.validated_reports} color="text-green-400" />
@@ -56,12 +55,6 @@ export default function MetricsBar({ metrics, connected, weather, onDecayRisk, o
         <span className="text-[10px] text-gray-500">
           Last: {fmtTime(metrics.last_updated)}
         </span>
-        <button onClick={onDecayRisk} className="btn btn-ghost text-xs" title="Apply 1h risk decay">
-          🌅 Decay
-        </button>
-        <button onClick={onSeedVehicles} className="btn btn-ghost text-xs" title="Seed demo vehicles">
-          + Fleet
-        </button>
       </div>
     </div>
   );

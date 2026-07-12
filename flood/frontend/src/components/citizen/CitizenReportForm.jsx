@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const HAZARDS = [
   { value: "flood", label: "🌊 Flood / Waterlogging" },
@@ -22,12 +22,70 @@ export default function CitizenReportForm({ position, onSubmit }) {
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [photoDataUrl, setPhotoDataUrl] = useState("");
+  const [photoPreview, setPhotoPreview] = useState("");
+  const [photoMeta, setPhotoMeta] = useState(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+    };
+  }, []);
+
+  async function startCamera() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError("Camera access is not supported in this browser.");
+      return;
+    }
+    try {
+      setCameraError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+      setCameraActive(true);
+    } catch (err) {
+      setCameraError(err.message || "Unable to access the camera.");
+    }
+  }
+
+  async function capturePhoto() {
+    if (!videoRef.current) return;
+    const video = videoRef.current;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+    const currentPosition = position || null;
+    setPhotoDataUrl(dataUrl);
+    setPhotoPreview(dataUrl);
+    setPhotoMeta({
+      lat: currentPosition?.lat ?? null,
+      lng: currentPosition?.lng ?? null,
+      timestamp: new Date().toISOString(),
+    });
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError(null);
     if (!position) {
       setError("Please enable location services to submit a report.");
+      return;
+    }
+    if (!photoDataUrl) {
+      setError("Please click a live photo to submit a report.");
       return;
     }
     setSubmitting(true);
@@ -39,9 +97,21 @@ export default function CitizenReportForm({ position, onSubmit }) {
         lat: position.lat,
         lng: position.lng,
         accuracy_m: position.accuracy,
+        photo_data_url: photoDataUrl,
+        photo_gps_lat: photoMeta?.lat ?? position.lat,
+        photo_gps_lng: photoMeta?.lng ?? position.lng,
+        shutter_time: photoMeta?.timestamp,
       });
       // Reset
       setDescription("");
+      setPhotoDataUrl("");
+      setPhotoPreview("");
+      setPhotoMeta(null);
+      setCameraActive(false);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
     } catch (err) {
       setError(err.message || "Failed to submit report.");
     } finally {
@@ -93,6 +163,41 @@ export default function CitizenReportForm({ position, onSubmit }) {
             </select>
           </div>
         )}
+
+        <div>
+          <label className="label">Live photo of the hazard</label>
+          {!cameraActive ? (
+            <button type="button" onClick={startCamera} className="btn btn-primary w-full text-xs">
+              Open Camera
+            </button>
+          ) : (
+            <button type="button" onClick={capturePhoto} className="btn btn-secondary w-full text-xs">
+              Capture Photo
+            </button>
+          )}
+          {cameraError && (
+            <div className="mt-2 rounded border border-red-700/40 bg-red-900/20 p-2 text-[10px] text-red-300">
+              {cameraError}
+            </div>
+          )}
+          <div className="mt-2 overflow-hidden rounded border border-[#1f2d4d] bg-[#0b1220]">
+            <video ref={videoRef} className="h-40 w-full object-cover bg-black" muted playsInline />
+          </div>
+          <p className="mt-1 text-[10px] text-gray-500">
+            A live camera photo is required. The time and live location are captured when the shutter is clicked.
+          </p>
+          {photoPreview && (
+            <div className="mt-2 overflow-hidden rounded border border-[#1f2d4d] bg-[#0b1220]">
+              <img src={photoPreview} alt="Captured hazard" className="h-40 w-full object-cover" />
+            </div>
+          )}
+          {photoMeta && (
+            <div className="mt-2 rounded border border-[#1f2d4d] bg-[#0b1220] p-2 text-[11px] text-gray-400">
+              <div>📍 Capture location: {photoMeta.lat?.toFixed(5) ?? "—"}, {photoMeta.lng?.toFixed(5) ?? "—"}</div>
+              <div>🕒 Capture time: {new Date(photoMeta.timestamp).toLocaleString()}</div>
+            </div>
+          )}
+        </div>
 
         <div>
           <label className="label">Description (optional)</label>

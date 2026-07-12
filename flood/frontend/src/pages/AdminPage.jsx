@@ -5,7 +5,7 @@ import MetricsBar from "../components/admin/MetricsBar";
 import LiveFeedPanel from "../components/admin/LiveFeedPanel";
 import { useWebSocket } from "../hooks/useWebSocket";
 import { api } from "../services/api";
-import { ICONS, vehicleIcon, makeIcon, makePulseIcon } from "../utils/icons";
+import { ICONS, vehicleIcon, makeIcon, makePulseIcon, hazardIcon } from "../utils/icons";
 import { riskColor } from "../utils/format";
 
 const DEFAULT_CENTER = [12.9100, 74.8500];
@@ -431,7 +431,7 @@ export default function AdminPage() {
     log("sim_start", `Simulation started on Route ${String.fromCharCode(65 + selectedRouteIdx)} (${geom.length} points)`);
   }, [plannedRoutes, selectedRouteIdx, startSimulationOnGeometry, log]);
 
-  // Stop vehicle simulation
+  // Stop vehicle simulation and clear all drawn route overlays
   const handleStopSimulation = useCallback(() => {
     if (simIntervalRef.current) {
       clearInterval(simIntervalRef.current);
@@ -442,8 +442,11 @@ export default function AdminPage() {
     setSimProgress(0);
     setSimGeomIdx(0);
     simGeomRef.current = [];
-    setSimStatus("Simulation stopped");
-    log("sim_stop", "Simulation stopped");
+    setPlannedRoutes([]);
+    setRoutes({});
+    setFloodMarkers([]);
+    setSimStatus("Simulation stopped — routes cleared");
+    log("sim_stop", "Simulation stopped and all route overlays cleared");
   }, [log]);
 
   // Cleanup on unmount
@@ -582,8 +585,6 @@ export default function AdminPage() {
         metrics={metrics}
         connected={connected}
         weather={weather}
-        onDecayRisk={handleDecayRisk}
-        onSeedVehicles={handleSeedVehicles}
       />
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_460px] overflow-hidden">
         {/* Map */}
@@ -638,63 +639,15 @@ export default function AdminPage() {
               />
             ))}
 
-            {/* Facilities */}
-            {facilities.map((f) => (
-              <Marker key={`f-${f.id}`} position={[f.lat, f.lng]} icon={ICONS[f.facility_type] || ICONS.hospital}>
-                <Popup>
-                  <div className="text-xs">
-                    <div className="font-bold">{f.name}</div>
-                    <div className="uppercase text-gray-400">{f.facility_type}</div>
-                    {f.phone && <div>{f.phone}</div>}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-
-            {/* Incidents */}
-            {incidents.filter((i) => i.status !== "resolved").map((i) => (
-              <Marker key={`i-${i.id}`} position={[i.lat, i.lng]} icon={ICONS.incident}>
-                <Popup>
-                  <div className="text-xs space-y-1">
-                    <div className="font-bold">{i.title}</div>
-                    <div>Priority: P{i.priority}</div>
-                    <div>Status: {i.status}</div>
-                    {i.description && <div className="text-gray-400">{i.description}</div>}
-                    {i.status === "open" && (
-                      <button className="btn btn-primary text-xs mt-1" onClick={() => handleDispatch(i.id)}>
-                        Dispatch Nearest
-                      </button>
-                    )}
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-
-            {/* Reports */}
+            {/* Citizen reports only */}
             {reports.slice(0, 40).map((r) => (
-              <Marker key={`r-${r.id}`} position={[r.lat, r.lng]} icon={r.hazard_type === "flood" ? ICONS.flood : ICONS.incident}>
+              <Marker key={`r-${r.id}`} position={[r.lat, r.lng]} icon={hazardIcon(r.hazard_type)}>
                 <Popup>
                   <div className="text-xs space-y-1">
                     <div className="font-bold uppercase">{r.hazard_type}</div>
                     <div>Depth: {r.flood_depth}</div>
                     <div>Confidence: {((r.confidence_score || 0) * 100).toFixed(0)}%</div>
                     <div>Status: {r.status}</div>
-                  </div>
-                </Popup>
-              </Marker>
-            ))}
-
-            {/* Vehicles */}
-            {vehicles.map((v) => (
-              <Marker key={`v-${v.id}`} position={[v.lat, v.lng]} icon={vehicleIcon(v.vehicle_type)}>
-                <Popup>
-                  <div className="text-xs space-y-1">
-                    <div className="font-bold">{v.call_sign}</div>
-                    <div className="uppercase text-gray-400">{v.vehicle_type}</div>
-                    <div>Status: {v.status}</div>
-                    <div>Speed: {Math.round(v.speed_kmh || 0)} km/h</div>
-                    {v.route_eta_seconds != null && <div>ETA: {Math.round(v.route_eta_seconds)}s</div>}
-                    {v.route_distance_m != null && <div>Dist: {(v.route_distance_m / 1000).toFixed(2)} km</div>}
                   </div>
                 </Popup>
               </Marker>
