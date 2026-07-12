@@ -1,0 +1,30 @@
+# Keep dev artifacts out of git
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env
+*.db
+*.sqlite*
+cache/
+# Exclude downloaded graph cache, but KEEP bundled real graph in app/data/
+cache/*.graphml
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store

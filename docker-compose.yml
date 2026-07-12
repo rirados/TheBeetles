@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: floodguardian-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - FLOODGUARDIAN_DEBUG=true
+      - FLOODGUARDIAN_DATABASE_URL=sqlite:///./floodguardian.db
+      - FLOODGUARDIAN_USE_REDIS=false
+      - FLOODGUARDIAN_DEFAULT_PLACE=Mangalore, Karnataka, India
+      - FLOODGUARDIAN_CORS_ORIGINS=["http://localhost:5173","http://localhost:3000","http://127.0.0.1:5173"]
+    volumes:
+      - ./backend/cache:/app/cache
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: floodguardian-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      # Inside Docker, the frontend container must proxy to the backend service
+      # name (not localhost, which is the frontend container itself).
+      - VITE_API_TARGET=http://backend:8000
+      - VITE_WS_TARGET=ws://backend:8000
+    restart: unless-stopped
+
+  # Optional: Redis for multi-process pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: floodguardian-redis
+    ports:
+      - "6379:6379"
+    profiles:
+      - redis
+    restart: unless-stopped
+
+  # Optional: PostgreSQL for production
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: floodguardian-postgres
+    environment:
+      - POSTGRES_DB=floodguardian
+      - POSTGRES_USER=floodguardian
+      - POSTGRES_PASSWORD=floodguardian
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    profiles:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  pgdata:
